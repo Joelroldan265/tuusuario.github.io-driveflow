@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DriveFlow</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f5f7;--card:#ffffff;--border:#e0e0e5;--border2:#c8c8d0;
+  --text:#1a1a1a;--muted:#6e6e80;--hint:#a0a0b0;
+  --blue:#3b82f6;--blue2:#2563eb;--green:#16a34a;--red:#dc2626;--amber:#d97706;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+header{height:52px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;flex-shrink:0}
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:13px;font-weight:500}
+.logo-dot{width:22px;height:22px;border-radius:5px;background:var(--blue);display:flex;align-items:center;justify-content:center}
+.logo-dot svg{width:12px;height:12px;fill:white}
+.tabs{display:flex;gap:2px;margin-left:8px}
+.tab{padding:5px 12px;border-radius:6px;border:none;background:transparent;font-family:var(--font);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.tab:hover{background:var(--bg);color:var(--text)}.tab.on{background:var(--bg);color:var(--text)}
+.spacer{flex:1}
+.huser{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted)}
+.av{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600}
+.hbtn{padding:5px 10px;border-radius:6px;border:1px solid var(--border2);background:transparent;font-family:var(--font);font-size:12px;color:var(--muted);cursor:pointer}
+.hbtn:hover{background:var(--bg);color:var(--text)}
+.body{display:flex;flex:1;overflow:hidden}
+nav{width:190px;background:var(--card);border-right:1px solid var(--border);padding:10px 8px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto}
+.nl{font-size:10px;font-weight:600;letter-spacing:.07em;color:var(--hint);text-transform:uppercase;padding:8px 8px 3px}
+.ni{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;font-size:13px;color:var(--muted);cursor:pointer;border:1px solid transparent;transition:all .1s;user-select:none}
+.ni svg{width:14px;height:14px;flex-shrink:0;opacity:.7}
+.ni:hover{background:var(--bg);color:var(--text)}.ni.on{background:#eff6ff;border-color:#bfdbfe;color:var(--blue)}.ni.on svg{opacity:1}
+.sep{height:1px;background:var(--border);margin:5px 0}
+.stor{margin:10px 6px 0;padding:10px;background:var(--bg);border-radius:8px;border:1px solid var(--border)}
+.stor-lbl{font-size:11px;color:var(--muted);margin-bottom:6px}
+.stor-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:5px}
+.stor-fill{height:100%;background:var(--blue);border-radius:2px;width:0%;transition:width .5s}
+.stor-info{font-size:11px;font-family:var(--mono);color:var(--hint)}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.page{display:none;flex:1;flex-direction:column;overflow:hidden}
+.page.on{display:flex}
+.toolbar{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:8px;flex-shrink:0}
+.search{flex:1;max-width:320px;position:relative}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:13px;height:13px;color:var(--hint)}
+.search input{width:100%;padding:6px 10px 6px 28px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none}
+.search input:focus{border-color:var(--blue)}.search input::placeholder{color:var(--hint)}
+.tbr{margin-left:auto;display:flex;align-items:center;gap:6px}
+.ibtn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .1s}
+.ibtn:hover,.ibtn.on{background:var(--bg);border-color:var(--border2);color:var(--text)}
+.btn{font-family:var(--font);font-size:12px;font-weight:500;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;transition:all .15s}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted)}.btn-ghost:hover{color:var(--text);border-color:var(--text)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue2)}
+.bc{padding:7px 14px;border-bottom:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:4px;font-size:12px;font-family:var(--mono);flex-shrink:0;flex-wrap:wrap}
+.bc-item{color:var(--muted);cursor:pointer}.bc-item:hover{color:var(--text)}.bc-sep{color:var(--border2)}.bc-cur{color:var(--text)}
+.abar{padding:7px 14px;background:#eff6ff;border-bottom:1px solid #bfdbfe;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--blue);flex-shrink:0}
+.files{flex:1;overflow-y:auto;padding:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(144px,1fr));gap:8px}
+.list .grid{grid-template-columns:1fr;gap:2px}
+.fc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:11px 10px;cursor:pointer;transition:all .15s;position:relative;user-select:none}
+.fc:hover{border-color:var(--border2);box-shadow:0 1px 6px rgba(0,0,0,.06)}.fc.sel{border-color:#93c5fd;background:#eff6ff}
+.fc-check{position:absolute;top:7px;right:7px;width:16px;height:16px;border-radius:50%;background:var(--blue);display:none;align-items:center;justify-content:center}
+.fc-check svg{width:9px;height:9px;fill:white}.fc.sel .fc-check{display:flex}
+.fc-icon{font-size:22px;margin-bottom:7px;line-height:1}.fc-name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}.fc-meta{font-size:10px;font-family:var(--mono);color:var(--hint)}
+.list .fc{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px}
+.list .fc:hover{transform:none}.list .fc-icon{font-size:16px;margin:0;flex-shrink:0}.list .fc-name{flex:1;margin:0}.list .fc-meta{min-width:80px;text-align:right}.list .fc-check{position:static;margin-left:2px;flex-shrink:0}
+.sb{padding:5px 14px;border-top:1px solid var(--border);background:var(--card);display:flex;align-items:center;gap:8px;font-size:11px;font-family:var(--mono);color:var(--hint);flex-shrink:0}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+.xfer{flex:1;overflow-y:auto;padding:18px}
+.xfer-hdr{margin-bottom:16px}.xfer-hdr h2{font-size:17px;font-weight:600;margin-bottom:3px}.xfer-hdr p{font-size:13px;color:var(--muted)}
+.xfer-grid{display:grid;grid-template-columns:1fr 84px 1fr;gap:0;align-items:start}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.panel-hdr{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel-title{display:flex;align-items:center;gap:7px;flex:1;min-width:0}
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;flex-shrink:0}
+.badge-a{background:#eff6ff;color:var(--blue)}.badge-b{background:#f0fdf4;color:var(--green)}
+.panel-user{font-size:11px;color:var(--hint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.panel-body{min-height:260px;max-height:380px;overflow-y:auto}
+.panel-foot{padding:8px 13px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pbc{display:flex;align-items:center;gap:3px;font-family:var(--mono);font-size:11px;flex-wrap:wrap;flex:1;min-width:0}
+.pbc span{cursor:pointer;color:var(--muted)}.pbc span:hover{color:var(--text)}.pbc .cur{color:var(--text);cursor:default}.pbc-sep{color:var(--border2)}
+.ptabs{display:flex;gap:2px;padding:6px 8px;border-bottom:1px solid var(--border);background:var(--bg)}
+.ptab{padding:4px 10px;border-radius:5px;border:none;font-family:var(--font);font-size:12px;color:var(--muted);background:transparent;cursor:pointer}
+.ptab:hover{background:var(--card);color:var(--text)}.ptab.on{background:var(--card);color:var(--text);font-weight:500}
+.prow{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid var(--border);cursor:pointer;font-size:13px;transition:background .1s;user-select:none}
+.prow:last-child{border-bottom:none}.prow:hover{background:var(--bg)}.prow.sel{background:#eff6ff}
+.pcheck{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .1s}
+.prow.sel .pcheck{background:var(--blue);border-color:var(--blue)}
+.pcheck svg{width:9px;height:9px;fill:white;display:none}.prow.sel .pcheck svg{display:block}
+.picon{font-size:15px;flex-shrink:0}.pname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.psize{font-size:11px;font-family:var(--mono);color:var(--hint);flex-shrink:0}
+.nc{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px;gap:10px;padding:20px;text-align:center}
+.nc svg{width:34px;height:34px;opacity:.18}.nc p{font-size:13px;color:var(--muted)}
+.mid{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px 6px;margin-top:56px}
+.arr-icon{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.xcount{font-size:11px;font-family:var(--mono);color:var(--muted);text-align:center}
+.xbtn{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:600;cursor:pointer;width:100%;line-height:1.5;transition:all .15s}
+.xbtn:hover{background:var(--blue2)}.xbtn:disabled{opacity:.35;cursor:not-allowed}
+.xlog{margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.xlog-hdr{padding:8px 13px;border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.06em}
+.lrow{display:flex;flex-direction:column;gap:6px;padding:10px 13px;border-bottom:1px solid var(--border);font-size:12px}
+.lrow:last-child{border-bottom:none}
+.lrow-top{display:flex;align-items:center;gap:9px}
+.ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ldot.ok{background:var(--green)}.ldot.err{background:var(--red)}.ldot.run{background:var(--amber);animation:pulse .8s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
+.lstatus{font-size:11px;font-family:var(--mono);color:var(--muted);flex-shrink:0}
+.lbar-wrap{height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:none}
+.lbar-fill{height:100%;width:0%;border-radius:3px;transition:width .3s ease;background:linear-gradient(90deg,var(--blue),#60a5fa)}
+.lrow.running .lbar-wrap{display:block}
+.lrow.done .lbar-fill{background:linear-gradient(90deg,var(--green),#4ade80) !important}
+.lrow.failed .lbar-fill{background:var(--red) !important}
+.lpct{font-size:11px;font-family:var(--mono);font-weight:500;color:var(--blue);min-width:36px;text-align:right;flex-shrink:0}
+.lrow.done .lpct{color:var(--green)}.lrow.failed .lpct{color:var(--red)}
+.login{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:99}
+.lcard{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:32px 40px;max-width:380px;width:90%;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.ldot2{width:44px;height:44px;border-radius:11px;background:var(--blue);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.ldot2 svg{width:22px;height:22px;fill:white}
+.lcard h1{font-size:20px;font-weight:600;margin-bottom:5px}.lcard p{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:20px}
+.lsec{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);text-align:left}
+.llbl{font-size:10px;font-weight:600;color:var(--hint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.linput{width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:7px;padding:8px 10px;font-size:12px;font-family:var(--mono);color:var(--text);outline:none;margin-bottom:5px}
+.linput:focus{border-color:var(--blue)}.lhelp{font-size:11px;color:var(--hint);line-height:1.5}.lhelp a{color:var(--blue);text-decoration:none}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;padding:10px 18px;background:#fff;color:#1a1a1a;border:1px solid var(--border2);border-radius:8px;font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;transition:all .15s;margin-top:14px}
+.gbtn:hover{box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center}
+.modal-bg.on{display:flex}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:20px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,.1)}
+.modal h3{font-size:14px;font-weight:600;margin-bottom:12px}.modal-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:14px}
+.pitem{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:9px 11px;margin-bottom:7px}
+.pname2{font-size:12px;font-weight:500;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ptrack{height:3px;background:var(--border);border-radius:2px;overflow:hidden}.pfill{height:100%;background:var(--blue);border-radius:2px;transition:width .3s}
+.pst{font-size:10px;font-family:var(--mono);color:var(--hint);margin-top:4px}
+.toasts{position:fixed;bottom:16px;right:16px;z-index:300;display:flex;flex-direction:column;gap:6px}
+.toast{background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;font-size:13px;display:flex;align-items:center;gap:8px;animation:tin .2s ease;min-width:180px;box-shadow:0 3px 12px rgba(0,0,0,.08)}
+@keyframes tin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.tdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}.toast.ok .tdot{background:var(--green)}.toast.err .tdot{background:var(--red)}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:150px;gap:9px;color:var(--hint)}
+.empty svg{width:30px;height:30px;opacity:.2}.empty p{font-size:13px}
+.loading{display:flex;align-items:center;gap:8px;padding:16px;font-size:13px;color:var(--muted)}
+.spin{width:15px;height:15px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:spinr .7s linear infinite;flex-shrink:0}
+@keyframes spinr{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+</style>
+</head>
+<body>
+
+<div class="login" id="loginScreen">
+  <div class="lcard">
+    <div class="ldot2"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+    <h1>DriveFlow</h1>
+    <p>Navega, descarga y transfiere archivos entre cuentas de Google Drive.</p>
+    <div class="lsec">
+      <div class="llbl">Client ID de Google OAuth</div>
+      <input class="linput" id="cid" placeholder="xxxx.apps.googleusercontent.com"/>
+      <div class="lhelp"><a href="https://console.cloud.google.com/apis/credentials" target="_blank">Crear Client ID gratis →</a> · Habilita Google Drive API</div>
+    </div>
+    <button class="gbtn" onclick="login()">
+      <svg viewBox="0 0 24 24" width="17" height="17"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Conectar con Google Drive
+    </button>
+    <p style="font-size:11px;color:var(--hint);margin-top:10px">La segunda cuenta se conecta desde el panel de transferencia.</p>
+  </div>
+</div>
+
+<div id="app" style="display:none;flex-direction:column;height:100vh;overflow:hidden">
+<header>
+  <div class="logo"><div class="logo-dot"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>DriveFlow</div>
+  <div class="tabs">
+    <button class="tab on" onclick="showPage('browser')">Mi Drive</button>
+    <button class="tab" onclick="showPage('transfer')">↔ Transferir cuentas</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="huser"><div class="av" id="uav">U</div><span id="uname">—</span></div>
+  <button class="hbtn" onclick="location.reload()">Salir</button>
+</header>
+<div class="body">
+  <nav>
+    <div class="nl">Navegación</div>
+    <div class="ni on" id="ni-root" onclick="goSection('root','Mi Drive')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Mi Drive</div>
+    <div class="ni" id="ni-shared" onclick="goSection('shared','Compartidos')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Compartidos</div>
+    <div class="ni" id="ni-recent" onclick="goSection('recent','Recientes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Recientes</div>
+    <div class="ni" id="ni-starred" onclick="goSection('starred','Destacados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Destacados</div>
+    <div class="sep"></div>
+    <div class="nl">Herramientas</div>
+    <div class="ni" onclick="showPage('browser');setTimeout(()=>document.getElementById('srch').focus(),50)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Buscar</div>
+    <div class="ni" onclick="showPage('transfer')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>Transferir</div>
+    <div class="ni" onclick="openUploadModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Subir archivos</div>
+    <div class="stor"><div class="stor-lbl">Almacenamiento</div><div class="stor-bar"><div class="stor-fill" id="sfill"></div></div><div class="stor-info" id="sinfo">—</div></div>
+  </nav>
+  <div class="content">
+
+    <!-- BROWSER -->
+    <div class="page on" id="page-browser">
+      <div class="toolbar">
+        <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input id="srch" placeholder="Buscar archivos..." oninput="doSearch(this.value)"/></div>
+        <div class="tbr">
+          <button class="ibtn on" id="vgrid" onclick="setView('grid')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+          <button class="ibtn" id="vlist" onclick="setView('list')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></button>
+          <button class="btn btn-ghost" id="bdl" style="display:none" onclick="downloadSel()">↓ Descargar</button>
+          <button class="btn btn-ghost" onclick="clearSel()">Deseleccionar</button>
+        </div>
+      </div>
+      <div class="bc" id="bc"></div>
+      <div class="abar" id="abar" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M9 11l3 3L22 4"/></svg>
+        <span id="abar-txt">0 seleccionados</span>
+        <button class="btn btn-ghost" onclick="downloadSel()" style="font-size:11px;padding:4px 9px">↓ Descargar</button>
+        <button style="margin-left:auto;background:none;border:none;cursor:pointer;color:var(--hint);font-size:16px;line-height:1" onclick="clearSel()">×</button>
+      </div>
+      <div class="files" id="files-wrap"><div class="grid" id="grid"></div></div>
+      <div class="sb"><div class="sb-dot" id="sb-dot"></div><span id="sb-txt">Conectado</span><span id="sb-count" style="color:var(--hint)"></span></div>
+    </div>
+
+    <!-- TRANSFER -->
+    <div class="page" id="page-transfer">
+      <div class="xfer">
+        <div class="xfer-hdr"><h2>Transferir entre cuentas</h2><p>Selecciona archivos del origen y cópialos a la cuenta destino, sin descargar nada a tu PC.</p></div>
+        <div class="xfer-grid">
+
+          <div class="panel">
+            <div class="panel-hdr">
+              <div class="panel-title"><span class="badge badge-a">Cuenta A — Origen</span><span class="panel-user" id="pa-user"></span></div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 9px;flex-shrink:0" onclick="selAllA()">Sel. todo</button>
+            </div>
+            <div class="ptabs">
+              <button class="ptab on" id="ptA-mine" onclick="setPanelASection('root')">Mi Drive</button>
+              <button class="ptab" id="ptA-shared" onclick="setPanelASection('shared')">Compartidos</button>
+            </div>
+            <div class="panel-body" id="pa-body"><div class="loading"><div class="spin"></div>Cargando...</div></div>
+            <div class="panel-foot">
+              <div class="pbc" id="pa-bc"></div>
+              <span id="pa-sel" style="font-family:var(--mono);font-size:11px;color:var(--muted);flex-shrink:0">0 sel.</span>
+            </div>
+          </div>
+
+          <div class="mid">
+            <div class="arr-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+            <div class="xcount" id="xcount">0 archivos</div>
+            <button class="xbtn" id="xbtn" onclick="doTransfer()" disabled>Copiar al<br>Drive B →</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-hdr">
+              <div class="panel-title"><span class="badge badge-b">Cuenta B — Destino</span><span class="panel-user" id="pb-user"></span></div>
+              <button class="btn btn-ghost" style="font-size:11px;padding:4px 9px;flex-shrink:0" id="pb-connect" onclick="loginB()">+ Conectar cuenta B</button>
+            </div>
+            <div class="panel-body" id="pb-body">
+              <div class="nc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><p>Conecta la cuenta destino</p><button class="btn btn-blue" onclick="loginB()">Conectar cuenta B</button></div>
+            </div>
+            <div class="panel-foot">
+              <div class="pbc" id="pb-bc"></div>
+              <span id="pb-dest" style="font-size:11px;font-family:var(--mono);color:var(--green);flex-shrink:0"></span>
+            </div>
+          </div>
+
+        </div>
+        <div class="xlog" id="xlog" style="display:none">
+  <div class="xlog-hdr" style="display:flex;align-items:center;justify-content:space-between">
+    <span>Registro de transferencia</span>
+    <button id="stop-btn" onclick="stopTransfer()" style="font-family:var(--font);font-size:11px;padding:3px 10px;border-radius:5px;border:1px solid var(--red);background:transparent;color:var(--red);cursor:pointer;display:none">⏹ Detener</button>
+  </div>
+  <div id="xlog-items"></div>
+</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<div class="modal-bg" id="dlmodal">
+  <div class="modal"><h3>Descargando archivos</h3><div id="dllist"></div><div class="modal-btns"><button class="btn btn-ghost" onclick="document.getElementById('dlmodal').classList.remove('on')">Cerrar</button></div></div>
+</div>
+
+<div class="modal-bg" id="ulmodal">
+  <div class="modal" style="max-width:480px">
+    <h3>Subir archivos a Drive</h3>
+    <div id="ul-drop" style="border:2px dashed var(--border2);border-radius:9px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:12px" onclick="document.getElementById('ul-input').click()" ondragover="ulDrag(event,true)" ondragleave="ulDrag(event,false)" ondrop="ulDrop(event)">
+      <div style="font-size:28px;margin-bottom:8px">📂</div>
+      <p style="font-size:13px;font-weight:500;margin-bottom:4px">Arrastra archivos aquí</p>
+      <p style="font-size:12px;color:var(--hint)">o haz clic para seleccionar</p>
+      <input id="ul-input" type="file" multiple style="display:none" onchange="ulFilesSelected(this.files)"/>
+    </div>
+    <div id="ul-dest" style="font-size:12px;color:var(--muted);margin-bottom:10px">Destino: <span id="ul-dest-name" style="font-weight:500;color:var(--text)">Mi Drive (raíz)</span></div>
+    <div id="ul-list"></div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="document.getElementById('ulmodal').classList.remove('on')">Cerrar</button>
+      <button class="btn btn-blue" id="ul-btn" onclick="doUpload()" disabled>Subir</button>
+    </div>
+  </div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ── STATE ──
+const DISC='https://www.googleapis.com/discovery/v1/apis/drive/v3/rest';
+const SCOPE='https://www.googleapis.com/auth/drive';
+let tokA=null,tokB=null,tcA=null,tcB=null;
+// Browser
+let bSection='root',bStack=[{id:'root',name:'Mi Drive'}],bFiles=[],bSel=new Map(),bView='grid',bST=null;
+// Transfer
+let paSection='root',paStack=[{id:'root',name:'Mi Drive'}],pbStack=[{id:'root',name:'Mi Drive'}],paSel=new Map(),pbDestId='root';
+
+// ── AUTH ──
+function loadGapi(){return new Promise(r=>{const s=document.createElement('script');s.src='https://apis.google.com/js/api.js';s.onload=()=>gapi.load('client',async()=>{await gapi.client.init({discoveryDocs:[DISC]});r();});document.head.appendChild(s);})}
+function loadGIS(cid,cb){return new Promise(r=>{const init=()=>r(google.accounts.oauth2.initTokenClient({client_id:cid,scope:SCOPE,callback:cb}));if(window.google?.accounts){init();return;}const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.onload=init;document.head.appendChild(s);})}
+
+async function login(){
+  const cid=document.getElementById('cid').value.trim();
+  if(!cid||!cid.includes('.apps.googleusercontent.com')){toast('Client ID inválido','err');return;}
+  localStorage.setItem('df_cid',cid);
+  await loadGapi();
+  tcA=await loadGIS(cid,async r=>{
+    if(r.error){toast('Error de auth','err');return;}
+    tokA=r.access_token; gapi.client.setToken({access_token:tokA});
+    await getProfile('a');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('app').style.display='flex';
+    renderBC(); loadBrowser(); loadStorage();
+  });
+  tcA.requestAccessToken({prompt:'consent'});
+}
+
+async function loginB(){
+  const cid=localStorage.getItem('df_cid');if(!cid){toast('Falta Client ID','err');return;}
+  tcB=await loadGIS(cid,async r=>{
+    if(r.error){toast('Error cuenta B','err');return;}
+    tokB=r.access_token; await getProfile('b');
+    document.getElementById('pb-connect').style.display='none';
+    loadPanelB(); updPASel(); toast('Cuenta B conectada','ok');
+  });
+  tcB.requestAccessToken({prompt:'select_account'});
+}
+
+async function getProfile(w){
+  try{
+    const t=w==='a'?tokA:tokB;
+    const r=await fetch('https://www.googleapis.com/oauth2/v2/userinfo',{headers:{Authorization:'Bearer '+t}});
+    const u=await r.json();
+    if(w==='a'){document.getElementById('uname').textContent=u.name||u.email||'Usuario';document.getElementById('uav').textContent=(u.name||u.email||'U')[0].toUpperCase();document.getElementById('pa-user').textContent=u.email||'';}
+    else{document.getElementById('pb-user').textContent=u.email||'';}
+  }catch(e){}
+}
+
+// ── BROWSER LOAD ──
+async function loadBrowser(folderId){
+  setSt('Cargando...',true);
+  document.getElementById('grid').innerHTML='<div class="loading"><div class="spin"></div>Cargando...</div>';
+  let q,order='folder,name';
+  // KEY RULE: if folderId is passed, ALWAYS query by parent ID.
+  // Only use section-based queries when no folderId (i.e. we're at the root of a section).
+  if(folderId){
+    q=`'${folderId}' in parents and trashed=false`;
+  } else if(bSection==='shared'){
+    q="sharedWithMe=true and trashed=false";
+  } else if(bSection==='recent'){
+    q="trashed=false"; order='modifiedTime desc';
+  } else if(bSection==='starred'){
+    q="starred=true and trashed=false";
+  } else {
+    q="'root' in parents and trashed=false";
+  }
+  try{
+    gapi.client.setToken({access_token:tokA});
+    const r=await gapi.client.drive.files.list({q,orderBy:order,fields:'files(id,name,mimeType,size,modifiedTime)',pageSize:100});
+    bFiles=r.result.files||[]; renderFiles(bFiles); setSt('Conectado',false);
+    document.getElementById('sb-count').textContent='· '+bFiles.length+' elementos';
+  }catch(e){
+    toast('Error: '+e.message,'err'); setSt('Error',false);
+    document.getElementById('grid').innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg><p>Error al cargar</p></div>';
+  }
+}
+
+// ── BROWSER RENDER ──
+function renderFiles(files){
+  document.getElementById('files-wrap').className='files'+(bView==='list'?' list':'');
+  const grid=document.getElementById('grid');
+  if(!files.length){grid.innerHTML='<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><p>Carpeta vacía</p></div>';return;}
+  grid.innerHTML=files.map(f=>{
+    const isF=f.mimeType==='application/vnd.google-apps.folder';
+    const sz=f.size?fmtSz(+f.size):isF?'Carpeta':'—';
+    const dt=f.modifiedTime?new Date(f.modifiedTime).toLocaleDateString('es-MX',{day:'2-digit',month:'short'}):'';
+    const sel=bSel.has(f.id)?'sel':'';
+    return`<div class="fc ${sel}" id="fc-${f.id}" data-id="${f.id}" data-name="${esc(f.name)}" data-mime="${f.mimeType}" data-folder="${isF}" onclick="fcClick(event,this)"><div class="fc-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div class="fc-icon">${icon(f.mimeType)}</div><div class="fc-name" title="${esc(f.name)}">${esc(f.name)}</div><div class="fc-meta">${sz}${dt?' · '+dt:''}</div></div>`;
+  }).join('');
+}
+
+function fcClick(e,el){
+  const id=el.dataset.id,name=el.dataset.name,mime=el.dataset.mime,isF=el.dataset.folder==='true';
+  if(isF&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){openFolder(id,name);}
+  else{toggleBSel(id,name,mime,el);}
+}
+function toggleBSel(id,name,mime,el){
+  if(!el)el=document.getElementById('fc-'+id);
+  if(bSel.has(id)){bSel.delete(id);el&&el.classList.remove('sel');}
+  else{bSel.set(id,{id,name,mime});el&&el.classList.add('sel');}
+  updABar();
+}
+function updABar(){const n=bSel.size;document.getElementById('abar').style.display=n>0?'flex':'none';document.getElementById('bdl').style.display=n>0?'inline-flex':'none';document.getElementById('abar-txt').textContent=n+' seleccionado'+(n>1?'s':'');}
+function clearSel(){bSel.forEach((v,k)=>{const el=document.getElementById('fc-'+k);el&&el.classList.remove('sel');});bSel.clear();updABar();}
+
+// ── BROWSER NAVIGATION ──
+function goSection(sec,name){
+  bSection=sec; bStack=[{id:sec==='root'?'root':sec,name}];
+  clearSel(); renderBC();
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  const ni=document.getElementById('ni-'+sec);if(ni)ni.classList.add('on');
+  loadBrowser(); // no folderId → uses bSection query
+}
+
+function openFolder(id,name){
+  bStack.push({id,name}); clearSel(); renderBC();
+  loadBrowser(id); // folderId provided → queries by parent ID
+}
+
+function bcGo(i){
+  bStack=bStack.slice(0,i+1); clearSel(); renderBC();
+  if(i===0){loadBrowser();}       // root of section
+  else{loadBrowser(bStack[i].id);} // subfolder
+}
+
+function renderBC(){
+  document.getElementById('bc').innerHTML=bStack.map((b,i)=>{
+    const last=i===bStack.length-1,sep=i>0?'<span class="bc-sep"> / </span>':'';
+    return last?sep+`<span class="bc-cur">${esc(b.name)}</span>`:sep+`<span class="bc-item" onclick="bcGo(${i})">${esc(b.name)}</span>`;
+  }).join('');
+}
+
+function doSearch(q){
+  clearTimeout(bST);
+  if(!q.trim()){renderFiles(bFiles);return;}
+  bST=setTimeout(async()=>{
+    try{
+      gapi.client.setToken({access_token:tokA});
+      const r=await gapi.client.drive.files.list({q:`name contains '${q.replace(/'/g,"\\'")}' and trashed=false`,fields:'files(id,name,mimeType,size,modifiedTime)',pageSize:50});
+      const f=r.result.files||[];renderFiles(f);document.getElementById('sb-count').textContent='· '+f.length+' resultados';
+    }catch(e){toast('Error búsqueda','err');}
+  },380);
+}
+
+function setView(v){bView=v;document.getElementById('vgrid').classList.toggle('on',v==='grid');document.getElementById('vlist').classList.toggle('on',v==='list');renderFiles(bFiles);}
+
+// ── BROWSER DOWNLOAD ──
+async function downloadSel(){
+  if(!bSel.size){toast('Selecciona archivos','err');return;}
+  const files=[...bSel.values()];
+  document.getElementById('dlmodal').classList.add('on');
+  const list=document.getElementById('dllist');list.innerHTML='';
+  for(const f of files){const d=document.createElement('div');d.className='pitem';d.id='dl-'+f.id;d.innerHTML=`<div class="pname2">${esc(f.name)}</div><div class="ptrack"><div class="pfill" id="pf-${f.id}" style="width:0%"></div></div><div class="pst" id="ps-${f.id}">Esperando...</div>`;list.appendChild(d);}
+  for(const f of files)await dlOne(f);
+  toast(files.length+' archivo'+(files.length>1?'s':'')+' descargado'+(files.length>1?'s':''),'ok');
+}
+
+async function dlOne(f){
+  const fill=document.getElementById('pf-'+f.id),st=document.getElementById('ps-'+f.id);
+  try{
+    st.textContent='Descargando...';fill.style.width='20%';
+    const{url,ext}=exportUrl(f.id,f.mime);
+    const r=await fetch(url,{headers:{Authorization:'Bearer '+tokA}});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    fill.style.width='70%';const blob=await r.blob();fill.style.width='100%';
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=f.name+ext;a.click();URL.revokeObjectURL(a.href);
+    st.textContent='✓ Listo';st.style.color='var(--green)';
+  }catch(e){st.textContent='✗ '+e.message;st.style.color='var(--red)';fill.style.background='var(--red)';}
+}
+
+function exportUrl(id,mime){
+  const gmap={'application/vnd.google-apps.document':['application/vnd.openxmlformats-officedocument.wordprocessingml.document','.docx'],'application/vnd.google-apps.spreadsheet':['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet','.xlsx'],'application/vnd.google-apps.presentation':['application/vnd.openxmlformats-officedocument.presentationml.presentation','.pptx']};
+  if(mime&&gmap[mime]){const[em,ext]=gmap[mime];return{url:`https://www.googleapis.com/drive/v3/files/${id}/export?mimeType=${encodeURIComponent(em)}`,ext};}
+  if(mime&&mime.includes('google-apps'))return{url:`https://www.googleapis.com/drive/v3/files/${id}/export?mimeType=application/pdf`,ext:'.pdf'};
+  return{url:`https://www.googleapis.com/drive/v3/files/${id}?alt=media`,ext:''};
+}
+
+// ── TRANSFER PANEL A ──
+async function loadPanelA(folderId){
+  const body=document.getElementById('pa-body');
+  body.innerHTML='<div class="loading"><div class="spin"></div>Cargando...</div>';
+  let q;
+  if(folderId){
+    q=`'${folderId}' in parents and trashed=false`;
+  } else if(paSection==='shared'){
+    q="sharedWithMe=true and trashed=false";
+  } else {
+    q="'root' in parents and trashed=false";
+  }
+  try{
+    gapi.client.setToken({access_token:tokA});
+    const r=await gapi.client.drive.files.list({q,orderBy:'folder,name',fields:'files(id,name,mimeType,size)',pageSize:100});
+    renderPanel('a',r.result.files||[]); renderPBC('a');
+  }catch(e){body.innerHTML=`<div class="nc"><p>Error: ${esc(e.message)}</p></div>`;}
+}
+
+function setPanelASection(sec){
+  paSection=sec;
+  paStack=sec==='shared'?[{id:'shared',name:'Compartidos'}]:[{id:'root',name:'Mi Drive'}];
+  paSel.clear(); updPASel();
+  document.getElementById('ptA-mine').classList.toggle('on',sec==='root');
+  document.getElementById('ptA-shared').classList.toggle('on',sec==='shared');
+  loadPanelA(); // no folderId → uses section query
+}
+
+// ── TRANSFER PANEL B ──
+async function loadPanelB(folderId){
+  if(!tokB)return;
+  const id=folderId||pbStack[pbStack.length-1].id;
+  pbDestId=id;
+  const body=document.getElementById('pb-body');
+  body.innerHTML='<div class="loading"><div class="spin"></div>Cargando...</div>';
+  try{
+    const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(`'${id}' in parents and trashed=false`)}&orderBy=folder,name&fields=files(id,name,mimeType,size)&pageSize=100`,{headers:{Authorization:'Bearer '+tokB}});
+    const d=await r.json();
+    renderPanel('b',d.files||[]); renderPBC('b');
+    document.getElementById('pb-dest').textContent='→ '+pbStack[pbStack.length-1].name;
+  }catch(e){body.innerHTML=`<div class="nc"><p>Error: ${esc(e.message)}</p></div>`;}
+}
+
+// ── TRANSFER RENDER ──
+function renderPanel(p,files){
+  const body=document.getElementById(p==='a'?'pa-body':'pb-body');
+  if(!files.length){body.innerHTML='<div class="nc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg><p>Carpeta vacía</p></div>';return;}
+  body.innerHTML=files.map(f=>{
+    const isF=f.mimeType==='application/vnd.google-apps.folder';
+    const sz=f.size?fmtSz(+f.size):isF?'Carpeta':'—';
+    const sel=(p==='a'&&paSel.has(f.id))?'sel':'';
+    return`<div class="prow ${sel}" id="pr-${p}-${f.id}" data-p="${p}" data-id="${f.id}" data-name="${esc(f.name)}" data-mime="${f.mimeType}" data-folder="${isF}" onclick="prClick(this)">
+      ${p==='a'?`<div class="pcheck"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>`:''}
+      <span class="picon">${icon(f.mimeType)}</span>
+      <span class="pname">${esc(f.name)}</span>
+      <span class="psize">${sz}</span>
+    </div>`;
+  }).join('');
+}
+
+function prClick(el){
+  const p=el.dataset.p,id=el.dataset.id,name=el.dataset.name,mime=el.dataset.mime,isF=el.dataset.folder==='true';
+  if(isF){
+    if(p==='a'){paStack.push({id,name});loadPanelA(id);}
+    else{pbStack.push({id,name});loadPanelB(id);}
+    return;
+  }
+  if(p==='a'){
+    if(paSel.has(id)){paSel.delete(id);el.classList.remove('sel');}
+    else{paSel.set(id,{id,name,mime});el.classList.add('sel');}
+    updPASel();
+  }
+}
+
+function selAllA(){
+  document.querySelectorAll('#pa-body .prow').forEach(el=>{
+    if(el.dataset.folder==='true')return;
+    const id=el.dataset.id,name=el.dataset.name,mime=el.dataset.mime;
+    if(!paSel.has(id)){paSel.set(id,{id,name,mime});el.classList.add('sel');}
+  });
+  updPASel();
+}
+
+function updPASel(){const n=paSel.size;document.getElementById('pa-sel').textContent=n+' sel.';document.getElementById('xcount').textContent=n+(n===1?' archivo':' archivos');document.getElementById('xbtn').disabled=n===0||!tokB;}
+
+function renderPBC(p){
+  const stack=p==='a'?paStack:pbStack;
+  const el=document.getElementById(p==='a'?'pa-bc':'pb-bc');
+  el.innerHTML=stack.map((b,i)=>{
+    const last=i===stack.length-1,sep=i>0?'<span class="pbc-sep"> / </span>':'';
+    return last?sep+`<span class="cur">${esc(b.name)}</span>`:sep+`<span onclick="pbcGo('${p}',${i})">${esc(b.name)}</span>`;
+  }).join('');
+}
+
+function pbcGo(p,i){
+  if(p==='a'){paStack=paStack.slice(0,i+1);i===0?loadPanelA():loadPanelA(paStack[i].id);}
+  else{pbStack=pbStack.slice(0,i+1);loadPanelB(pbStack[i].id);}
+}
+
+// ── TRANSFER COPY ──
+async function doTransfer(){
+  if(!tokB){toast('Conecta la cuenta B','err');return;}
+  const files=[...paSel.values()];if(!files.length){toast('Selecciona archivos','err');return;}
+  stopRequested=false;
+  document.getElementById('xlog').style.display='block';
+  document.getElementById('xlog-items').innerHTML='';
+  document.getElementById('xbtn').disabled=true;
+  const stopBtn=document.getElementById('stop-btn');
+  stopBtn.style.display='block';stopBtn.disabled=false;stopBtn.textContent='⏹ Detener';
+  let ok=0,err=0;
+  for(const f of files){
+    if(stopRequested){
+      addLog(f.id+'_skip',f.name,'err','Cancelado');
+      continue;
+    }
+    addLog(f.id,f.name,'run','Iniciando...');
+    try{await copyFile(f);updLog(f.id,'ok','✓ Copiado');ok++;}
+    catch(e){
+      if(stopRequested)updLog(f.id,'err','Cancelado');
+      else updLog(f.id,'err','✗ '+e.message);
+      err++;
+    }
+  }
+  stopBtn.style.display='none';
+  const msg=stopRequested?`Detenido: ${ok} copiado${ok>1?'s':''}`:`Listo: ${ok} copiado${ok>1?'s':''}${err>0?', '+err+' error'+(err>1?'es':''):''}`;
+  toast(msg,ok>0?'ok':'err');
+  loadPanelB(); document.getElementById('xbtn').disabled=false;
+}
+
+async function copyFile(f){
+  const{url,ext}=exportUrl(f.id,f.mime);
+
+  // Step 1: Download with stream progress
+  updLog(f.id,'run','Descargando...',5);
+  const dl=await fetch(url,{headers:{Authorization:'Bearer '+tokA}});
+  if(!dl.ok)throw new Error('Descarga error '+dl.status);
+
+  // Read with progress if content-length available
+  const total=+dl.headers.get('content-length')||0;
+  let loaded=0;
+  const reader=dl.body.getReader();
+  const chunks=[];
+  while(true){
+    const{done,value}=await reader.read();
+    if(done)break;
+    chunks.push(value); loaded+=value.length;
+    if(total>0){
+      const pct=Math.min(Math.round(loaded/total*50),50); // 0-50% = download phase
+      updLog(f.id,'run',`Descargando... ${Math.round(loaded/total*100)}%`,pct);
+    } else {
+      // No content-length: pulse between 10-45%
+      const pct=Math.min(10+Math.round(loaded/1048576),45);
+      updLog(f.id,'run',`Descargando... ${fmtSz(loaded)}`,pct);
+    }
+  }
+  const blob=new Blob(chunks);
+
+  // Step 2: Upload
+  updLog(f.id,'run','Subiendo...',55);
+  const meta=JSON.stringify({name:f.name+ext,parents:[pbDestId]});
+  const form=new FormData();
+  form.append('metadata',new Blob([meta],{type:'application/json'}));
+  form.append('file',blob);
+  updLog(f.id,'run','Subiendo... 0%',55);
+
+  // Use XMLHttpRequest for upload progress
+  await new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST','https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
+    xhr.setRequestHeader('Authorization','Bearer '+tokB);
+    xhr.upload.onprogress=e=>{
+      if(e.lengthComputable){
+        const pct=50+Math.round(e.loaded/e.total*48); // 50-98%
+        updLog(f.id,'run',`Subiendo... ${Math.round(e.loaded/e.total*100)}%`,pct);
+      }
+    };
+    xhr.onload=()=>{
+      if(xhr.status>=200&&xhr.status<300){resolve();}
+      else{try{const e=JSON.parse(xhr.responseText);reject(new Error(e.error?.message||'Subida error '+xhr.status));}catch{reject(new Error('Subida error '+xhr.status));}}
+    };
+    xhr.onerror=()=>reject(new Error('Error de red'));
+    xhr.send(form);
+  });
+}
+
+function addLog(id,name,type,status){
+  const el=document.createElement('div');
+  el.className='lrow running'; el.id='lr-'+id;
+  el.innerHTML=`
+    <div class="lrow-top">
+      <div class="ldot ${type}"></div>
+      <span class="lname">${esc(name)}</span>
+      <span class="lstatus" id="ls-${id}">${status}</span>
+      <span class="lpct" id="lp-${id}">0%</span>
+    </div>
+    <div class="lbar-wrap">
+      <div class="lbar-fill" id="lb-${id}"></div>
+    </div>`;
+  document.getElementById('xlog-items').appendChild(el);
+  // scroll log into view
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function updLog(id,type,status,pct){
+  const el=document.getElementById('lr-'+id); if(!el)return;
+  el.querySelector('.ldot').className='ldot '+type;
+  const ls=document.getElementById('ls-'+id); if(ls)ls.textContent=status;
+  const lb=document.getElementById('lb-'+id);
+  const lp=document.getElementById('lp-'+id);
+  if(pct!==undefined){
+    if(lb)lb.style.width=pct+'%';
+    if(lp)lp.textContent=Math.round(pct)+'%';
+  }
+  if(type==='ok'){
+    el.classList.remove('running');el.classList.add('done');
+    if(lb)lb.style.width='100%';
+    if(lp)lp.textContent='100%';
+  }
+  if(type==='err'){
+    el.classList.remove('running');el.classList.add('failed');
+  }
+}
+
+// ── STORAGE ──
+async function loadStorage(){
+  try{
+    gapi.client.setToken({access_token:tokA});
+    const r=await gapi.client.drive.about.get({fields:'storageQuota'});
+    const q=r.result.storageQuota,used=+q.usage||0,total=+q.limit||0;
+    document.getElementById('sfill').style.width=total>0?Math.round(used/total*100)+'%':'0%';
+    document.getElementById('sinfo').textContent=total>0?`${fmtSz(used)} / ${fmtSz(total)}`:fmtSz(used)+' usado';
+  }catch(e){}
+}
+
+// ── PAGE SWITCH ──
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('page-'+name).classList.add('on');
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',['browser','transfer'][i]===name));
+  if(name==='transfer'&&tokA){
+    const body=document.getElementById('pa-body');
+    if(!body.querySelector('.prow')&&!body.querySelector('.nc'))loadPanelA();
+  }
+}
+
+// ── STATUS ──
+function setSt(msg,loading){document.getElementById('sb-txt').textContent=msg;document.getElementById('sb-dot').style.background=loading?'var(--amber)':'var(--green)';}
+
+// ── TOAST ──
+function toast(msg,type){const w=document.getElementById('toasts');const el=document.createElement('div');el.className='toast '+type;el.innerHTML=`<div class="tdot"></div><span>${msg}</span>`;w.appendChild(el);setTimeout(()=>el.remove(),3500);}
+
+// ── UTILS ──
+function icon(m){if(!m)return'📄';if(m.includes('folder'))return'📁';if(m.includes('image'))return'🖼️';if(m.includes('video'))return'🎬';if(m.includes('audio'))return'🎵';if(m.includes('pdf'))return'📄';if(m.includes('spreadsheet')||m.includes('excel'))return'📊';if(m.includes('presentation')||m.includes('powerpoint'))return'📑';if(m.includes('document')||m.includes('word'))return'📝';if(m.includes('zip')||m.includes('compressed'))return'🗜️';if(m.includes('text'))return'📃';return'📄';}
+function fmtSz(b){if(!b)return'—';const u=['B','KB','MB','GB'];let i=0;while(b>=1024&&i<u.length-1){b/=1024;i++;}return b.toFixed(i>0?1:0)+' '+u[i];}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+// ── STOP TRANSFER ──
+let stopRequested = false;
+
+function stopTransfer(){
+  stopRequested = true;
+  document.getElementById('stop-btn').disabled = true;
+  document.getElementById('stop-btn').textContent = 'Deteniendo...';
+  toast('Deteniendo después del archivo actual...','ok');
+}
+
+// ── UPLOAD ──
+let ulFiles = [];
+
+function openUploadModal(){
+  if(!tokA){toast('Inicia sesión primero','err');return;}
+  ulFiles=[];
+  document.getElementById('ul-list').innerHTML='';
+  document.getElementById('ul-btn').disabled=true;
+  // Show current folder as destination
+  const dest = bStack[bStack.length-1];
+  document.getElementById('ul-dest-name').textContent = dest.name + (dest.id==='root'?' (raíz)':'');
+  document.getElementById('ulmodal').classList.add('on');
+}
+
+function ulDrag(e,over){
+  e.preventDefault();
+  document.getElementById('ul-drop').style.background=over?'#eff6ff':'';
+  document.getElementById('ul-drop').style.borderColor=over?'var(--blue)':'var(--border2)';
+}
+
+function ulDrop(e){
+  e.preventDefault();
+  ulDrag(e,false);
+  ulFilesSelected(e.dataTransfer.files);
+}
+
+function ulFilesSelected(files){
+  ulFiles=[...files];
+  const list=document.getElementById('ul-list');
+  list.innerHTML='';
+  ulFiles.forEach(f=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px';
+    row.innerHTML=`<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span><span style="font-size:11px;font-family:var(--mono);color:var(--hint)">${fmtSz(f.size)}</span>`;
+    list.appendChild(row);
+  });
+  document.getElementById('ul-btn').disabled=ulFiles.length===0;
+}
+
+async function doUpload(){
+  if(!ulFiles.length)return;
+  const destId = bStack[bStack.length-1].id === 'root' ? 'root' : bStack[bStack.length-1].id;
+  const btn=document.getElementById('ul-btn');
+  btn.disabled=true; btn.textContent='Subiendo...';
+  let ok=0,err=0;
+  const list=document.getElementById('ul-list');
+  list.innerHTML='';
+
+  for(const f of ulFiles){
+    const row=document.createElement('div');
+    row.style.cssText='padding:8px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:5px">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500">${esc(f.name)}</span>
+      <span id="ust-${f.name.replace(/\W/g,'_')}" style="font-size:11px;font-family:var(--mono);color:var(--muted)">0%</span>
+    </div>
+    <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden">
+      <div id="ub-${f.name.replace(/\W/g,'_')}" style="height:100%;width:0%;background:var(--blue);border-radius:3px;transition:width .3s"></div>
+    </div>`;
+    list.appendChild(row);
+
+    try{
+      await uploadFile(f, destId);
+      const uid=f.name.replace(/\W/g,'_');
+      const ust=document.getElementById('ust-'+uid);if(ust){ust.textContent='✓';ust.style.color='var(--green)';}
+      const ub=document.getElementById('ub-'+uid);if(ub){ub.style.width='100%';ub.style.background='var(--green)';}
+      ok++;
+    }catch(e){
+      const uid=f.name.replace(/\W/g,'_');
+      const ust=document.getElementById('ust-'+uid);if(ust){ust.textContent='✗ '+e.message;ust.style.color='var(--red)';}
+      const ub=document.getElementById('ub-'+uid);if(ub){ub.style.background='var(--red)';}
+      err++;
+    }
+  }
+
+  btn.textContent='Subir';
+  btn.disabled=false;
+  toast(`${ok} archivo${ok>1?'s':''} subido${ok>1?'s':''}${err>0?', '+err+' error'+(err>1?'es':''):''}`,err===0?'ok':'err');
+  if(ok>0){loadBrowser(destId==='root'?undefined:destId);}
+}
+
+async function uploadFile(f, destId){
+  const meta=JSON.stringify({name:f.name, parents:[destId]});
+  const form=new FormData();
+  form.append('metadata',new Blob([meta],{type:'application/json'}));
+  form.append('file',f);
+  const uid=f.name.replace(/\W/g,'_');
+  await new Promise((resolve,reject)=>{
+    const xhr=new XMLHttpRequest();
+    xhr.open('POST','https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
+    xhr.setRequestHeader('Authorization','Bearer '+tokA);
+    xhr.upload.onprogress=e=>{
+      if(e.lengthComputable){
+        const pct=Math.round(e.loaded/e.total*100);
+        const ust=document.getElementById('ust-'+uid);if(ust)ust.textContent=pct+'%';
+        const ub=document.getElementById('ub-'+uid);if(ub)ub.style.width=pct+'%';
+      }
+    };
+    xhr.onload=()=>{
+      if(xhr.status>=200&&xhr.status<300)resolve();
+      else{try{const e=JSON.parse(xhr.responseText);reject(new Error(e.error?.message||'Error '+xhr.status));}catch{reject(new Error('Error '+xhr.status));}}
+    };
+    xhr.onerror=()=>reject(new Error('Error de red'));
+    xhr.send(form);
+  });
+}
+
+// ── INIT ──
+renderBC();
+const savedCid=localStorage.getItem('df_cid');if(savedCid)document.getElementById('cid').value=savedCid;
+</script>
+</body>
+</html>
